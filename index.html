@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>روافد للنقل - النسخة التجريبية</title>
+  <style>
+    * { box-sizing: border-box; font-family: Tahoma, Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: #f3f5f8;
+      color: #1b2430;
+    }
+    header {
+      background: #0f3d5e;
+      color: #fff;
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    header h1 { margin: 0; font-size: 18px; }
+    .badge {
+      background: #1f7a8c;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 12px;
+    }
+    .container { max-width: 680px; margin: 18px auto; padding: 0 14px; }
+    .card {
+      background: #fff;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 14px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .card h2 { margin: 0 0 12px; font-size: 16px; color: #0f3d5e; }
+    .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .stat {
+      background: #f8fafc;
+      border: 1px solid #e2e8f0;
+      border-radius: 10px;
+      padding: 12px;
+    }
+    .stat span { display: block; font-size: 12px; color: #52606d; }
+    .stat strong { font-size: 18px; color: #0f3d5e; }
+    label { display: block; font-size: 13px; margin: 10px 0 5px; font-weight: bold; }
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #cbd5e1;
+      border-radius: 8px;
+      font-size: 14px;
+    }
+    button {
+      margin-top: 14px;
+      width: 100%;
+      background: #0f3d5e;
+      color: #fff;
+      border: none;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    button:hover { background: #16537e; }
+    .trip-item {
+      border-right: 4px solid #1f7a8c;
+      background: #f8fafc;
+      padding: 10px 12px;
+      border-radius: 8px;
+      margin-top: 10px;
+      font-size: 13px;
+    }
+    .status {
+      display: inline-block;
+      margin-top: 4px;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 2px 8px;
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>روافد للنقل</h1>
+    <span class="badge">نسخة تجريبية v0.1</span>
+  </header>
+
+  <div class="container">
+    <div class="card">
+      <h2>ملخص التشغيل</h2>
+      <div class="grid">
+        <div class="stat">
+          <span>الرحلات النشطة</span>
+          <strong id="activeCount">2</strong>
+        </div>
+        <div class="stat">
+          <span>المركبات الجاهزة</span>
+          <strong>6 مركبات</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>طلب نقل جديد</h2>
+      <form id="tripForm">
+        <label for="fromLoc">نقطة الانطلاق</label>
+        <input id="fromLoc" type="text" placeholder="مثال: المستودع الرئيسي" required />
+
+        <label for="toLoc">نقطة الوصول</label>
+        <input id="toLoc" type="text" placeholder="مثال: السوق المركزي" required />
+
+        <label for="cargoType">نوع الحمولة / الخدمة</label>
+        <select id="cargoType">
+          <option value="بضائع ومواد عامة">بضائع ومواد عامة</option>
+          <option value="مواد زراعية وأعلاف">مواد زراعية وأعلاف</option>
+          <option value="طرد سريع">طرد سريع</option>
+        </select>
+
+        <button type="submit">إرسال طلب النقل</button>
+      </form>
+    </div>
+
+    <div class="card">
+      <h2>الرحلات المسجلة</h2>
+      <div id="tripsList">
+        <div class="trip-item">
+          <div><strong>#RF-101:</strong> من المستودع الرئيسي إلى فرع الشمال — <em>بضائع ومواد عامة</em></div>
+          <span class="status">قيد التنفيذ</span>
+        </div>
+        <div class="trip-item">
+          <div><strong>#RF-102:</strong> من نقطة التجميع إلى الميناء الجاف — <em>مواد زراعية وأعلاف</em></div>
+          <span class="status">بانتظار السائق</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let counter = 103;
+    const form = document.getElementById('tripForm');
+    const list = document.getElementById('tripsList');
+    const countEl = document.getElementById('activeCount');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      const fromVal = document.getElementById('fromLoc').value.trim();
+      const toVal = document.getElementById('toLoc').value.trim();
+      const cargoVal = document.getElementById('cargoType').value;
+      if (!fromVal || !toVal) return;
+
+      const item = document.createElement('div');
+      item.className = 'trip-item';
+      item.innerHTML = `
+        <div><strong>#RF-${counter++}:</strong> من ${fromVal} إلى ${toVal} — <em>${cargoVal}</em></div>
+        <span class="status">تم استلام الطلب</span>
+      `;
+      list.prepend(item);
+
+      const current = parseInt(countEl.textContent, 10) || 0;
+      countEl.textContent = current + 1;
+      form.reset();
+    });
+  </script>
+</body>
+</html>
